@@ -1,0 +1,200 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$comment": "https://docs.getdbt.com/reference/dbt_project.yml/",
+    "definitions": {
+        "directory": {
+            "type": "string",
+            "pattern": "((?:[^\/]*\/)*)(.*)"
+        },
+        "database_safe": {
+            "type": "string",
+            "pattern": "^[_a-zA-Z][a-zA-Z0-9_]*$"
+        },
+        "directory_array": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/directory"
+            },
+            "minItems": 1,
+            "additionalItems": false
+        },
+        "model_config": {
+            "type": "object",
+            "$comment": "https://docs.getdbt.com/reference/model-configs",
+            "patternProperties": {
+                "^[_a-zA-Z][a-zA-Z0-9_]*$": {
+                    "description": "Model configuration.",
+                    "type": "object",
+                    "properties": {
+                        "+enabled": {
+                            "$comment": "https://docs.getdbt.com/reference/resource-configs/enabled",
+                            "description": "An optional configuration for disabling models, seeds, and snapshots.",
+                            "type": "boolean"
+                        },
+                        "+tags": {
+                            "$comment": "https://docs.getdbt.com/reference/resource-configs/tags",
+                            "description": "Apply a tag (or list of tags) to a model, seed, or snapshot.",
+                            "types": {
+                                "items": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"    
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "+pre-hook": {
+                            "$comment": "https://docs.getdbt.com/reference/resource-configs/pre-hook-post-hook/",
+                            "description": "A SQL statement (or list of SQL statements) to be run before a model, seed or snapshot is built.",
+                            "type": "string"
+                        },
+                        "+post-hook": {
+                            "$comment": "https://docs.getdbt.com/reference/resource-configs/pre-hook-post-hook/",
+                            "description": "A SQL statement (or list of SQL statements) to be run after a model, seed or snapshot is built.",
+                            "type": "string"
+                        },
+                        "+database": {
+                            "$comment": "https://docs.getdbt.com/reference/resource-configs/database/",
+                            "description": "Optionally specify a custom database for a model or seed.",
+                            "type": "string",
+                            "pattern": "^[_a-zA-Z][a-zA-Z0-9_]*$"
+                        },
+                        "+schema": {
+                            "$comment": "https://docs.getdbt.com/reference/resource-configs/schema/",
+                            "description": "Optionally specify a custom schema for a model or seed.",
+                            "type": "string",
+                            "pattern": "^[_a-zA-Z][a-zA-Z0-9_]*$"
+                        },
+                        "+alias": {
+                            "$comment": "https://docs.getdbt.com/reference/resource-configs/alias/",
+                            "description": "Optionally specify a custom alias for a model or seed.",
+                            "type": "string",
+                            "pattern": "^[_a-zA-Z][a-zA-Z0-9_]*$"
+                        },
+                        "+persist_docs": {
+                            "$comment": "https://docs.getdbt.com/reference/resource-configs/persist_docs/",
+                            "description": "Optionally persist resource descriptions as column and relation comments in the database. By default, documentation persistence is disabled, but it can be enabled for specific resources or groups of resources as needed.",
+                            "type": "object",
+                            "properties": {
+                                "relation": {
+                                    "type": "boolean",
+                                    "description": "Persist relations in the database"
+                                },
+                                "columns": {
+                                    "type": "boolean",
+                                    "description": "Persist columns in the database"
+                                }
+                            },
+                            "additionalItems": false
+                        },
+                        "+full_refresh": {
+                            "$comment": "https://docs.getdbt.com/reference/resource-configs/full_refresh/",
+                            "description": "Optionally set a resource to always or never full-refresh.",
+                            "type": "boolean"
+                        }
+                    }
+                }
+            },
+            "minProperties": 1,
+            "additionalProperties": false
+        },
+        "nested_model_config": {
+            "anyOf": [
+                {
+                    "patternProperties": {
+                        "^[_a-zA-Z][a-zA-Z0-9_]*$": {
+                            "$ref": "#/definitions/nested_model_config"
+                        }
+                    }
+                },
+                {
+                    "$ref": "#/definitions/model_config"
+                }
+            ]
+            
+        }
+    },
+    "properties": {
+        "name": {
+            "$comment": "https://docs.getdbt.com/reference/project-configs/name",
+            "description": "The name of a dbt project. Must be letters, digits and underscores only, and cannot start with a digit.",
+            "$ref": "#/definitions/database_safe"
+        },
+        "version": {
+            "$comment": "https://docs.getdbt.com/reference/project-configs/version",
+            "description": "The version of a dbt project. Note that while this is a required parameter, it is not currently meaningfully used by dbt.",
+            "type": "string",
+            "pattern": "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$"
+        },
+        "config-version": {
+            "$comment": "https://docs.getdbt.com/reference/project-configs/config-version",
+            "description": "Without this configuration, dbt will assume your dbt_project.yml uses the version 1 syntax, which will be deprecated in a future release.",
+            "type": "number",
+            "default": 2
+        },
+        "profile": {
+            "$comment": "https://docs.getdbt.com/reference/project-configs/profile",
+            "description": "The profile your dbt project should use to connect to your data warehouse.",
+            "$ref": "#/definitions/database_safe"
+        },
+        "source-paths": {
+            "$comment": "https://docs.getdbt.com/reference/project-configs/source-paths",
+            "description": "Optionally specify a custom list of directories where models and sources are located.",
+            "$ref": "#/definitions/directory_array"
+        },
+        "macro-paths": {
+            "$comment": "https://docs.getdbt.com/reference/project-configs/macro-paths",
+            "description": "Optionally specify a custom list of directories where macros are located. Note that you cannot co-locate models and macros.",
+            "$ref": "#/definitions/directory_array"
+        },
+        "test-paths": {
+            "$comment": "https://docs.getdbt.com/reference/project-configs/test-paths",
+            "description": "Optionally specify a custom list of directories where data tests are located.",
+            "$ref": "#/definitions/directory_array"
+        },
+        "data-paths": {
+            "$comment": "https://docs.getdbt.com/reference/project-configs/data-paths",
+            "description": "Optionally specify a custom list of directories where seed files are located.",
+            "$ref": "#/definitions/directory_array"
+        },
+        "analysis-paths": {
+            "$comment": "https://docs.getdbt.com/reference/project-configs/analysis-paths",
+            "description": "Specify a custom list of directories where analyses are located.",
+            "$ref": "#/definitions/directory_array"
+        },
+        "target-path": {
+            "$comment": "https://docs.getdbt.com/reference/project-configs/target-path",
+            "description": "Optionally specify a custom directory where compiled files (e.g. compiled models and tests) will be written when you run the dbt run, dbt compile, or dbt test command.",
+            "$ref": "#/definitions/directory"
+        },
+        "modules-path": {
+            "$comment": "https://docs.getdbt.com/reference/project-configs/modules-path",
+            "description": "Optionally specify a custom directory where packages are installed when you run the dbt deps command. Note that this directory is usually git-ignored.",
+            "$ref": "#/definitions/directory"
+        },
+        "log-path": {
+            "$comment": "https://docs.getdbt.com/reference/project-configs/log-path",
+            "description": "Optionally specify a custom directory where dbt will write logs.",
+            "$ref": "#/definitions/directory"
+        },
+        "clean-targets": {
+            "$comment": "https://docs.getdbt.com/reference/project-configs/clean-targets",
+            "description": "Optionally specify a custom list of directories to be removed by the dbt clean command. As such, you should only include directories containing artifacts (e.g. compiled files, logs, installed packages) in this list.",
+            "$ref": "#/definitions/directory_array"
+        },
+        "models": {
+            "$ref": "#/definitions/nested_model_config"
+        }
+    },
+    "required": [
+      "name",
+      "version",
+      "config-version"
+    ],
+    "additionalProperties": false
+  }
