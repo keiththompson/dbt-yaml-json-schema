@@ -8,6 +8,6 @@ For usage with [YAML extension](https://marketplace.visualstudio.com/items?itemN
 
 ```json
 "yaml.schemas": {
-        "https://raw.githubusercontent.com/keiththompson/dbt-yaml-json-schema/main/dbt_project.json": ["dbt_project.yml"]
-    }
+  "https://raw.githubusercontent.com/keiththompson/dbt-yaml-json-schema/main/dbt_project.json": ["dbt_project.yml"]
+}
 ```
